@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PocketSmart AI</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#f4f7fb;
+    color:#172033;
+    padding-bottom:30px;
+}
+
+.header{
+    background:linear-gradient(135deg,#5b5ce2,#7b61ff);
+    color:white;
+    padding:25px 20px;
+    border-radius:0 0 25px 25px;
+}
+
+.header h1{
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.header p{
+    opacity:.9;
+    font-size:14px;
+}
+
+.container{
+    width:92%;
+    max-width:700px;
+    margin:20px auto;
+}
+
+.card{
+    background:white;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:18px;
+    box-shadow:0 5px 18px rgba(0,0,0,.07);
+}
+
+.card h2{
+    font-size:19px;
+    margin-bottom:15px;
+}
+
+.balance{
+    font-size:32px;
+    font-weight:bold;
+    margin:8px 0;
+}
+
+.balance-label{
+    color:#777;
+    font-size:13px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+
+.stat{
+    padding:15px;
+    border-radius:14px;
+}
+
+.income{
+    background:#e8fff2;
+}
+
+.expense{
+    background:#fff0f0;
+}
+
+.stat-title{
+    font-size:13px;
+    color:#666;
+}
+
+.stat-value{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+input,select{
+    width:100%;
+    padding:13px;
+    margin:7px 0;
+    border:1px solid #ddd;
+    border-radius:10px;
+    outline:none;
+    font-size:14px;
+}
+
+input:focus,select:focus{
+    border-color:#665ee8;
+}
+
+button{
+    border:none;
+    border-radius:10px;
+    padding:13px 18px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.add-btn{
+    width:100%;
+    background:#625ee8;
+    color:white;
+    margin-top:8px;
+}
+
+.add-btn:hover{
+    background:#504bd0;
+}
+
+.transaction{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:13px 0;
+    border-bottom:1px solid #eee;
+}
+
+.transaction:last-child{
+    border-bottom:none;
+}
+
+.transaction-left{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.icon{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#f0efff;
+}
+
+.t-name{
+    font-weight:bold;
+}
+
+.t-date{
+    font-size:11px;
+    color:#888;
+    margin-top:3px;
+}
+
+.amount-income{
+    color:#12a05c;
+    font-weight:bold;
+}
+
+.amount-expense{
+    color:#e54848;
+    font-weight:bold;
+}
+
+.delete-btn{
+    background:#ffe8e8;
+    color:#d33;
+    padding:7px 9px;
+    margin-left:8px;
+}
+
+.ai-box{
+    background:linear-gradient(135deg,#f1efff,#f7f5ff);
+    border:1px solid #e3dfff;
+}
+
+.ai-message{
+    line-height:1.6;
+    font-size:14px;
+}
+
+.quick-buttons{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.quick-buttons button{
+    background:white;
+    border:1px solid #ddd;
+    color:#555;
+    font-size:12px;
+}
+
+.chat{
+    margin-top:15px;
+}
+
+.chat-input{
+    display:flex;
+    gap:8px;
+}
+
+.chat-input input{
+    margin:0;
+}
+
+.chat-input button{
+    background:#625ee8;
+    color:white;
+}
+
+.empty{
+    text-align:center;
+    color:#999;
+    padding:20px 0;
+    font-size:14px;
+}
+
+.footer{
+    text-align:center;
+    color:#888;
+    font-size:12px;
+    margin-top:20px;
+}
+
+.progress{
+    height:10px;
+    background:#eee;
+    border-radius:10px;
+    overflow:hidden;
+    margin-top:10px;
+}
+
+.progress-bar{
+    height:100%;
+    width:0%;
+    background:#625ee8;
+    transition:.4s;
+}
+
+@media(max-width:450px){
+    .header h1{
+        font-size:24px;
+    }
+
+    .balance{
+        font-size:28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>💜 PocketSmart AI</h1>
+    <p>Your Personal Smart Money Assistant</p>
+</div>
+
+<div class="container">
+
+    <!-- BALANCE -->
+    <div class="card">
+        <div class="balance-label">Current Balance</div>
+        <div class="balance" id="balance">₹0</div>
+
+        <div class="stats">
+
+            <div class="stat income">
+                <div class="stat-title">Total Income</div>
+                <div class="stat-value" id="income">₹0</div>
+            </div>
+
+            <div class="stat expense">
+                <div class="stat-title">Total Expense</div>
+                <div class="stat-value" id="expense">₹0</div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ADD TRANSACTION -->
+    <div class="card">
+
+        <h2>➕ Add Transaction</h2>
+
+        <input
+            type="text"
+            id="description"
+            placeholder="Description (e.g. Food)"
+        >
+
+        <input
+            type="number"
+            id="amount"
+            placeholder="Amount ₹"
+        >
+
+        <select id="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+        </select>
+
+        <select id="category">
+            <option value="Food">🍔 Food</option>
+            <option value="Travel">🚌 Travel</option>
+            <option value="Shopping">🛍️ Shopping</option>
+            <option value="Education">📚 Education</option>
+            <option value="Bills">💡 Bills</option>
+            <option value="Salary">💰 Salary</option>
+            <option value="Other">📦 Other</option>
+        </select>
+
+        <button class="add-btn" onclick="addTransaction()">
+            Add Transaction
+        </button>
+
+    </div>
+
+
+    <!-- SAVING GOAL -->
+    <div class="card">
+
+        <h2>🎯 Monthly Saving Goal</h2>
+
+        <input
+            type="number"
+            id="savingGoal"
+            placeholder="Enter your goal ₹"
+        >
+
+        <button class="add-btn" onclick="setGoal()">
+            Set Saving Goal
+        </button>
+
+        <div id="goalText" style="margin-top:12px;font-size:13px;">
+            No saving goal set.
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+    </div>
+
+
+    <!-- AI ASSISTANT -->
+    <div class="card ai-box">
+
+        <h2>🤖 PocketSmart AI</h2>
+
+        <div class="ai-message" id="aiMessage">
+            Hello! 👋 I'm PocketSmart AI.
+            Add your income and expenses, and I'll help you understand your spending.
+        </div>
+
+        <div class="quick-buttons">
+            <button onclick="aiAdvice('save')">
+                💰 How to save?
+            </button>
+
+            <button onclick="aiAdvice('expense')">
+                📊 Check expenses
+            </button>
+
+            <button onclick="aiAdvice('budget')">
+                🎯 Budget advice
+            </button>
+        </div>
+
+        <div class="chat">
+
+            <div class="chat-input">
+
+                <input
+                    type="text"
+                    id="question"
+                    placeholder="Ask PocketSmart AI..."
+                >
+
+                <button onclick="askAI()">
+                    Ask
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TRANSACTIONS -->
+    <div class="card">
+
+        <h2>📋 Recent Transactions</h2>
+
+        <div id="transactionList">
+            <div class="empty">
+                No transactions yet.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        PocketSmart AI © 2026
+        <br>
+        Smart Finance • Smart Future
+    </div>
+
+</div>
+
+
+<script>
+
+let transactions =
+    JSON.parse(localStorage.getItem("pocketTransactions")) || [];
+
+let savingGoal =
+    Number(localStorage.getItem("pocketGoal")) || 0;
+
+
+// ADD TRANSACTION
+function addTransaction(){
+
+    const description =
+        document.getElementById("description").value.trim();
+
+    const amount =
+        Number(document.getElementById("amount").value);
+
+    const type =
+        document.getElementById("type").value;
+
+    const category =
+        document.getElementById("category").value;
+
+
+    if(description === "" || amount <= 0){
+
+        alert("Please enter a valid description and amount.");
+
+        return;
+    }
+
+
+    const transaction = {
+
+        id: Date.now(),
+
+        description: description,
+
+        amount: amount,
+
+        type: type,
+
+        category: category,
+
+        date: new Date().toLocaleDateString()
+
+    };
+
+
+    transactions.unshift(transaction);
+
+
+    localStorage.setItem(
+        "pocketTransactions",
+        JSON.stringify(transactions)
+    );
+
+
+    document.getElementById("description").value = "";
+    document.getElementById("amount").value = "";
+
+
+    updateDashboard();
+
+    aiMessage(
+        "Transaction added successfully! 💜"
+    );
+}
+
+
+// DELETE TRANSACTION
+function deleteTransaction(id){
+
+    transactions =
+        transactions.filter(t => t.id !== id);
+
+    localStorage.setItem(
+        "pocketTransactions",
+        JSON.stringify(transactions)
+    );
+
+    updateDashboard();
+}
+
+
+// UPDATE DASHBOARD
+function updateDashboard(){
+
+    let income = 0;
+    let expense = 0;
+
+
+    transactions.forEach(t => {
+
+        if(t.type === "income"){
+
+            income += t.amount;
+
+        }else{
+
+            expense += t.amount;
+
+        }
+
+    });
+
+
+    const balance = income - expense;
+
+
+    document.getElementById("income").innerText =
+        "₹" + income.toLocaleString("en-IN");
+
+    document.getElementById("expense").innerText =
+        "₹" + expense.toLocaleString("en-IN");
+
+    document.getElementById("balance").innerText =
+        "₹" + balance.toLocaleString("en-IN");
+
+
+    displayTransactions();
+
+    updateGoal(income, expense);
+}
+
+
+// DISPLAY TRANSACTIONS
+function displayTransactions(){
+
+    const list =
+        document.getElementById("transactionList");
+
+
+    if(transactions.length === 0){
+
+        list.innerHTML =
+            '<div class="empty">No transactions yet.</div>';
+
+        return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    transactions.forEach(t => {
+
+        const sign =
+            t.type === "income" ? "+" : "-";
+
+        const amountClass =
+            t.type === "income"
+            ? "amount-income"
+            : "amount-expense";
+
+
+        const icon =
+            getIcon(t.category);
+
+
+        const div =
+            document.createElement("div");
+
+        div.className = "transaction";
+
+
+        div.innerHTML = `
+
+            <div class="transaction-left">
+
+                <div class="icon">
+                    ${icon}
+                </div>
+
+                <div>
+
+                    <div class="t-name">
+                        ${escapeHTML(t.description)}
+                    </div>
+
+                    <div class="t-date">
+                        ${t.category} • ${t.date}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div>
+
+                <span class="${amountClass}">
+                    ${sign}₹${t.amount.toLocaleString("en-IN")}
+                </span>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteTransaction(${t.id})">
+                    ✕
+                </button>
+
+            </div>
+        `;
+
+
+        list.appendChild(div);
+
+    });
+
+}
+
+
+// CATEGORY ICON
+function getIcon(category){
+
+    const icons = {
+
+        Food:"🍔",
+
+        Travel:"🚌",
+
+        Shopping:"🛍️",
+
+        Education:"📚",
+
+        Bills:"💡",
+
+        Salary:"💰",
+
+        Other:"📦"
+
+    };
+
+    return icons[category] || "💳";
+}
+
+
+// SAVING GOAL
+function setGoal(){
+
+    const goal =
+        Number(document.getElementById("savingGoal").value);
+
+
+    if(goal <= 0){
+
+        alert("Enter a valid saving goal.");
+
+        return;
+
+    }
+
+
+    savingGoal = goal;
+
+
+    localStorage.setItem(
+        "pocketGoal",
+        savingGoal
+    );
+
+
+    updateDashboard();
+
+
+    document.getElementById("savingGoal").value = "";
+
+}
+
+
+// UPDATE GOAL
+function updateGoal(income, expense){
+
+    const goalText =
+        document.getElementById("goalText");
+
+    const progressBar =
+        document.getElementById("progressBar");
+
+
+    if(savingGoal <= 0){
+
+        goalText.innerText =
+            "No saving goal set.";
+
+        progressBar.style.width = "0%";
+
+        return;
+
+    }
+
+
+    const saved = Math.max(
+        0,
+        income - expense
+    );
+
+
+    let percentage =
+        (saved / savingGoal) * 100;
+
+
+    percentage =
+        Math.min(100, percentage);
+
+
+    progressBar.style.width =
+        percentage + "%";
+
+
+    goalText.innerText =
+        `Saved ₹${saved.toLocaleString("en-IN")} of ₹${savingGoal.toLocaleString("en-IN")} (${Math.round(percentage)}%)`;
+
+}
+
+
+// AI ADVICE
+function aiAdvice(type){
+
+    const income = getIncome();
+
+    const expense = getExpense();
+
+    const balance = income - expense;
+
+
+    if(type === "save"){
+
+        aiMessage(
+            `💰 Saving Tip: Try keeping at least 20% of your income for savings. Your current balance is ₹${balance.toLocaleString("en-IN")}. Avoid unnecessary purchases and set a monthly saving goal.`
+        );
+
+    }
+
+
+    if(type === "expense"){
+
+        aiMessage(
+            `📊 Expense Analysis: Your total spending is ₹${expense.toLocaleString("en-IN")}. Track small daily expenses because they can become a large monthly amount.`
+        );
+
+    }
+
+
+    if(type === "budget"){
+
+        const suggested =
+            income * 0.5;
+
+        aiMessage(
+            `🎯 Budget Tip: A simple starting plan is to keep essential expenses around 50% of income, savings around 20%, and the remaining amount for flexible spending. Your income recorded here is ₹${income.toLocaleString("en-IN")}.`
+        );
+
+    }
+
+}
+
+
+// ASK AI
+function askAI(){
+
+    const question =
+        document.getElementById("question").value
+        .toLowerCase()
+        .trim();
+
+
+    if(question === ""){
+
+        alert("Type your question first.");
+
+        return;
+
+    }
+
+
+    const income = getIncome();
+
+    const expense = getExpense();
+
+    const balance = income - expense;
+
+
+    let answer = "";
+
+
+    if(
+        question.includes("save") ||
+        question.includes("saving")
+    ){
+
+        answer =
+            `💰 Saving Advice: Your current balance is ₹${balance.toLocaleString("en-IN")}. Try saving a fixed amount immediately after receiving income.`;
+
+    }
+
+    else if(
+        question.includes("expense") ||
+        question.includes("spend")
+    ){
+
+        answer =
+            `📊 You have recorded ₹${expense.toLocaleString("en-IN")} as total expenses. Review your Food, Shopping and Travel expenses regularly.`;
+
+    }
+
+    else if(
+        question.includes("budget")
+    ){
+
+        answer =
+            `🎯 Budget Advice: Create a monthly spending limit and keep a separate amount for savings. Your recorded income is ₹${income.toLocaleString("en-IN")}.`;
+
+    }
+
+    else if(
+        question.includes("balance") ||
+        question.includes("money")
+    ){
+
+        answer =
+            `💳 Your current recorded balance is ₹${balance.toLocaleString("en-IN")}.`;
+
+    }
+
+    else{
+
+        answer =
+            `🤖 PocketSmart AI says: Track every income and expense, avoid unnecessary spending, and set a realistic monthly saving goal. 💜`;
+
+    }
+
+
+    aiMessage(answer);
+
+    document.getElementById("question").value = "";
+
+}
+
+
+// SHOW AI MESSAGE
+function aiMessage(message){
+
+    document.getElementById("aiMessage").innerText =
+        message;
+
+}
+
+
+// GET INCOME
+function getIncome(){
+
+    return transactions
+        .filter(t => t.type === "income")
+        .reduce(
+            (sum,t) => sum + t.amount,
+            0
+        );
+
+}
+
+
+// GET EXPENSE
+function getExpense(){
+
+    return transactions
+        .filter(t => t.type === "expense")
+        .reduce(
+            (sum,t) => sum + t.amount,
+            0
+        );
+
+}
+
+
+// SECURITY FOR DESCRIPTION
+function escapeHTML(text){
+
+    return text
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+// INITIAL LOAD
+updateDashboard();
+
+</script>
+
+</body>
+</html>
